@@ -1,12 +1,13 @@
 import React from 'react';
 import './App.css';
-import Board from './components/boards/index';
+import BoardsList from './components/boardsList';
+// import Album from './components/boardsList';
 //import { Button } from '@material-ui/core';
 
 function App() {
   return (
     <div className="App">
-      <Board />
+      <BoardsList />
     </div>
   );
 }
