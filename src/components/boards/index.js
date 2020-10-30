@@ -81,7 +81,7 @@ export default function Board() {
                                             {board.name}
                                         </Typography>
                                         <Typography variant="body2" color="textSecondary" component="p">
-                                            {board.content}
+                                            {board.description}
                                         </Typography>
                                     </CardContent>
                                     <CardActions>
