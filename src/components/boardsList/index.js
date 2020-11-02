@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Board from '../boards/index';
+import AddBoardDialog from '../addBoardDialog/index';
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import CameraIcon from '@material-ui/icons/Twitter';
-// import Card from '@material-ui/core/Card';
-// import CardActions from '@material-ui/core/CardActions';
+//import Card from '@material-ui/core/Card';
+//import CardActionArea from '@material-ui/core/CardActionArea';
 // import CardContent from '@material-ui/core/CardContent';
 // import CardMedia from '@material-ui/core/CardMedia';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -19,8 +20,8 @@ function Copyright() {
 	return (
 		<Typography variant="body2" color="textSecondary" align="center">
 			{'Copyright © '}
-			<Link color="inherit" href="https://material-ui.com/">
-				Your Website
+			<Link color="inherit" href="https://github.com/">
+				My Github
       		</Link>{' '}
 			{new Date().getFullYear()}
 			{'.'}
@@ -64,6 +65,61 @@ const useStyles = makeStyles((theme) => ({
 
 export default function BoardsList() {
 	const classes = useStyles();
+	const [error, setError] = useState(null);
+	const [loading, setLoading] = useState(false);
+	const [boards, setBoards] = useState([]);
+
+	// Note: the empty deps array [] means
+	// this useEffect will run once
+	// similar to componentDidMount()
+	useEffect(() => {
+		loadData();
+	}, [])
+
+	const loadData = () => {
+		fetch("http://localhost:5000/boards")
+			.then(res => res.json())
+			.then(
+				(result) => {
+					setBoards(result);
+				},
+				// Note: it's important to handle errors here
+				// instead of a catch() block so that we don't swallow
+				// exceptions from actual bugs in components.
+				(error) => {
+					setError(error);
+				}
+			);
+		setLoading(false);
+	}
+
+	const boardElement = boards.map((board) => {
+		if (error) {
+			return <div>Error: {error.message}</div>;
+		} else if (loading) {
+			return <div>Loading...</div>;
+		} else {
+			return (
+				<Board key={board.id}
+					boardItem={board}
+					onClickDelete={handleDelete} />
+			);
+		}
+	});
+
+	function handleDelete(itemId) {
+		fetch("http://localhost:5000/boards/" + itemId, {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json'
+			},
+		}).then(res => res.json())
+			.then(result => {
+				console.log(result);
+				loadData();
+			})
+	};
 
 	return (
 		<React.Fragment>
@@ -105,7 +161,21 @@ export default function BoardsList() {
 					</Container>
 				</div>
 				{/* End hero unit */}
-				<Board/>
+
+				<Container className={classes.cardGrid} maxWidth="sm">
+					<Grid container spacing={4}>
+
+						{boardElement}
+
+						<Grid item xs={12} sm={4} md={4}>
+							{/* <Card variant="outlined" className={classes.additionCard}>
+								<CardActionArea display="flex" > */}
+									<AddBoardDialog loadData={loadData} />
+								{/* </CardActionArea>
+							</Card> */}
+						</Grid>
+					</Grid>
+				</Container>
 			</main>
 			{/* Footer */}
 			<footer className={classes.footer}>
