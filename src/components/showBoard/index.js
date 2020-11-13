@@ -25,12 +25,13 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function ShowBoard() {
+export default function ShowBoard({match}) {
     const classes = useStyles();
-    const { id } = useParams();
+    const { id } = useParams();  //tương đương match.params.id;
     const [board, setBoard] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const userID = localStorage.getItem("userID");
 
     const [tags, setTags] = useState([]);
 
@@ -48,10 +49,16 @@ export default function ShowBoard() {
 
     useEffect(() => {
         const loadData = () => {
-            fetch(`http://localhost:5000/boards/${id}`)
+            fetch(`http://localhost:5000/boards/${id}`, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+                    //userID: userID
+            })
                 .then(res => res.json())
                 .then(
                     (result) => {
+                        console.log(result);
                         setBoard(result);
                         //console.log(result);
                     },

@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Link, Switch, NavLink } from 'react-router-dom';
 import './App.css';
 import BoardsList from './components/boardsList';
 import LoginSide from './components/login/index';
@@ -15,6 +15,8 @@ import HomeIcon from '@material-ui/icons/Home';
 import AccountIcon from '@material-ui/icons/AccountBox';
 import ShowBoard from './components/showBoard';
 import LinkUI from '@material-ui/core/Link';
+import SignUp from './components/signup';
+import UserProfile from './components/userProfile';
 
 function Copyright() {
 	return (
@@ -39,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 	breadCrumbsBlock: {
 		display: 'flex',
-		marginLeft: 800,
+		marginLeft: 700,
 	},
 	link: {
 		display: 'flex',
@@ -54,6 +56,42 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
 	const classes = useStyles();
+	//const history = useHistory();
+	// localStorage.setItem("isAuth", null);
+	// localStorage.setItem("Username", null);
+	// const isAuth = localStorage.getItem("isAuth");
+	let name = localStorage.getItem("name");
+	const username = localStorage.getItem("username");
+	const id = localStorage.getItem("userID");
+	// console.log(isAuth)
+	const [loginStatus, setLoginStatus] = useState(false);
+
+	const handleLogout = () => {
+		fetch("http://localhost:5000/auth/logout", {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' }
+		}).then(resp => resp.json())
+			.then(data => {
+				if (data.code === 0) {
+					localStorage.setItem("userID", null);
+					localStorage.setItem("name", null);
+					localStorage.setItem("isAuth", false);
+					// console.log(isAuth);
+					// console.log(username);
+					handleChangeLoginStatus();
+					window.alert('Log out successfully!');
+					//history.push('/signin');
+				}
+			})
+	}
+
+	const handleChangeLoginStatus = () => {
+		setLoginStatus(!loginStatus);
+	}
+
+	function handleEditProfile(nameChanged) {
+		name = nameChanged;
+	}
 
 	return (
 		<Router>
@@ -71,25 +109,65 @@ function App() {
 
 							<Breadcrumbs aria-label="breadcrumb" className={classes.breadCrumbsBlock}>
 								{/* <Router> */}
-								<Link color="inherit" to="/" className={classes.link}>
+								{/* <NavLink exact activeStyle={{ color: 'yellow' }} color="inherit" to="/" className={classes.link}>
 									<HomeIcon className={classes.iconForBreadSrum} />
         							Home
-      							</Link>
-								<Link
-									color="inherit"
-									to="/signin"
-									className={classes.link}>
-									<AccountIcon className={classes.iconForBreadSrum} />
-        							Sign in
-      							</Link>
+      							</NavLink> */}
+
+								{!loginStatus ?
+									<NavLink
+										exact
+										activeStyle={{ color: 'yellow' }}
+										color="inherit"
+										to="/signin"
+										className={classes.link}>
+										<AccountIcon className={classes.iconForBreadSrum} />
+        									Sign in
+								</NavLink> : null}
+								{!loginStatus ?
+									<NavLink
+										exact
+										activeStyle={{ color: 'yellow' }}
+										color="inherit"
+										to="/signup"
+										className={classes.link}>
+										<AccountIcon className={classes.iconForBreadSrum} />
+        									Sign up
+								  	</NavLink> : null}
+								{loginStatus ?
+									<NavLink
+										exact
+										activeStyle={{ color: 'yellow' }}
+										color="inherit"
+										to={`/profile`}
+										className={classes.link}>
+										<AccountIcon className={classes.iconForBreadSrum} />
+								  			Hi, {name}
+									</NavLink> : null}
+								{loginStatus ?
+									<NavLink
+										exact
+										activeStyle={{ color: 'yellow' }}
+										color="inherit"
+										to="/signin"
+										onClick={handleLogout}
+										className={classes.link}>
+										<AccountIcon className={classes.iconForBreadSrum} />
+								  			Sign out
+									</NavLink> : null}
+								{/* {renderValue} */}
+
 							</Breadcrumbs>
 						</Toolbar>
 					</AppBar>
-
+					{/* () => (<LoginSide handleChangeLoginStatus={handleChangeLoginStatus}/>) */}
 					<main>
 						<Switch>
-							<Route path="/board/:id" component={ShowBoard}></Route>
-							<Route path='/signin' component={LoginSide} />
+							<Route path="/boards/:id" component={ShowBoard}></Route>
+							<Route path='/signup' component={SignUp} />
+							<Route path='/signin' component={() => (<LoginSide handleChangeLoginStatus={handleChangeLoginStatus} />)} />
+							{/* <Route path='/signout' component={LoginSide} /> */}
+							<Route path='/profile' component={() => (<UserProfile name={name} username={username} handleEditProfile={handleEditProfile} />)} />
 							<Route path='/' component={BoardsList} />
 						</Switch>
 					</main>

@@ -12,6 +12,8 @@ export default function AddBoardDialog(props) {
     const [nameText, setNameText] = React.useState('');
     const [descriptionText, setDescriptionText] = React.useState('');
     const loadData = props.loadData;
+    // const user = localStorage.getItem("User");
+    const userID = localStorage.getItem("userID");
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -32,10 +34,12 @@ export default function AddBoardDialog(props) {
     }
 
     const handleSubmit = (e) => {
-
         fetch("http://localhost:5000/boards", {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                "userID": userID
+            },
             body: JSON.stringify({
                 "boardName": nameText,
                 "description": descriptionText,

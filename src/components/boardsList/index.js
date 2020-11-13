@@ -7,6 +7,8 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { useHistory } from 'react-router';
+//import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
 	icon: {
@@ -60,28 +62,61 @@ export default function BoardsList() {
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [boards, setBoards] = useState([]);
+	const isAuth = localStorage.getItem("isAuth");
+	const userID = localStorage.getItem("userID");
+	//const userID = user.id;
+	const history = useHistory();
+
+	if (isAuth === "null" || isAuth === "false") {
+		history.push('/signin');
+	}
 
 	// Note: the empty deps array [] means
 	// this useEffect will run once
 	// similar to componentDidMount()
 	useEffect(() => {
+		// console.log(isAuth);
+		// console.log(userID);
 		loadData();
 		loadData().catch(error => {
 			error.message();
 		});
 	}, [])
 
-	const loadData = async() => {
-		const response = await fetch("http://localhost:5000/boards");
+	const loadData = async () => {
 
-		if(!response.ok){
-			const message = `An error has occured: ${response.status}`;
-			throw new Error(message);
-		}
+		fetch("http://localhost:5000/boards", {
+			headers: {
+				'Content-Type': 'application/json',
+				"userID": userID
+			},
+				//userID: userID
+        }).then(resp => resp.json())
+            .then(data => {
+                if(data.code === 0){
+                    // localStorage.setItem("Username", data.result.user.id);
+                    // localStorage.setItem("isAuth", true);
+                    //console.log(localStorage.getItem("Username"));
+                    //window.alert('Login succesfully!');
+                    // handleChangeLoginStatus();
+					//history.push('/');
+					setBoards(data.results);
+                }else{
+                    window.alert('Can not load your data!. Please try again!');
+				}
+            })
 
-		const results = await response.json();
-		setBoards(results);
-		setLoading(false);
+		// const response = await fetch("http://localhost:5000/boards");
+
+		// if (!response.ok) {
+		// 	const message = `An error has occured: ${response.status}`;
+		// 	// throw new Error(message);
+		// 	alert(message);
+		// }
+
+		// const results = await response.json();
+		// setBoards(results);
+		// setLoading(false);
 	}
 
 	const boardElement = boards.map((board) => {
@@ -94,7 +129,6 @@ export default function BoardsList() {
 				<Board key={board.id}
 					boardItem={board}
 					onClickDelete={handleDelete}
-					onClickBoard={handleClick}
 					loadData={loadData} />
 			);
 		}
@@ -113,11 +147,6 @@ export default function BoardsList() {
 				loadData();
 			})
 	};
-
-	function handleClick(board) {
-		console.log(board);
-		window.location.href = `/board/${board.id}`;
-	}
 
 	return (
 		<main>
