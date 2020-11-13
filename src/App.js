@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from './config/config.json';
 import { BrowserRouter as Router, Route, Link, Switch, NavLink } from 'react-router-dom';
 import './App.css';
 import BoardsList from './components/boardsList';
@@ -67,7 +68,7 @@ function App() {
 	const [loginStatus, setLoginStatus] = useState(false);
 
 	const handleLogout = () => {
-		fetch("http://localhost:5000/auth/logout", {
+		fetch(`${config.uriPath}/auth/logout`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' }
 		}).then(resp => resp.json())

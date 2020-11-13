@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from '../../config/config.json';
 import { Link, useHistory } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -50,7 +51,7 @@ export default function SignUp() {
     }
 
     function handleSubmit(e){
-        fetch("http://localhost:5000/users/register", {
+        fetch(`${config.uriPath}/users/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

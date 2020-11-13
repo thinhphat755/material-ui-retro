@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from '../../config/config.json';
 import { Link, useHistory } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
@@ -53,7 +54,7 @@ export default function SignIn(props) {
     }
 
     function handleSubmit(e) {
-        fetch("http://localhost:5000/auth/login", {
+        fetch(`${config.uriPath}/auth/login`, {
             method: 'POST',
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
@@ -85,7 +86,7 @@ export default function SignIn(props) {
     }
 
     const responseSuccessGoogle = (response) => {
-        fetch("http://localhost:5000/auth/googleLogin", {
+        fetch(`${config.uriPath}/auth/googleLogin`, {
             method: 'POST',
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
@@ -115,7 +116,7 @@ export default function SignIn(props) {
 
     const responseSuccessFacebook = (response) => {
         console.log(response);
-        fetch("http://localhost:5000/auth/facebookLogin", {
+        fetch(`${config.uriPath}/auth/facebookLogin`, {
             method: 'POST',
             credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },

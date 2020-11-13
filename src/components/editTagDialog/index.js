@@ -1,4 +1,5 @@
 import React from 'react';
+import config from '../../config/config.json';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -29,7 +30,7 @@ export default function EditTagDialog(props) {
 
     const handleSubmit = (e) => {
         const tagId = tag.tag_id;
-        fetch(`http://localhost:5000/tags/${tagId}`, {
+        fetch(`${config.uriPath}/tags/${tagId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -1,4 +1,5 @@
 import React from 'react';
+import config from '../../config/config.json';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
@@ -29,7 +30,7 @@ export default function TagsList(props) {
     const loadTagsData = props.loadData;
 
     function handleDelete(tagId) {
-        fetch(`http://localhost:5000/tags/${tagId}`, {
+        fetch(`${config.uriPath}/tags/${tagId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

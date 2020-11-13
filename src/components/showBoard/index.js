@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import config from '../../config/config.json';
 import { makeStyles } from '@material-ui/core/styles';
 import AddTagDialog from '../addTagDialog/index';
 import TagsList from '../tagsList/index';
@@ -49,7 +50,7 @@ export default function ShowBoard({match}) {
 
     useEffect(() => {
         const loadData = () => {
-            fetch(`http://localhost:5000/boards/${id}`, {
+            fetch(`${config.uriPath}/boards/${id}`, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -81,7 +82,7 @@ export default function ShowBoard({match}) {
     }, [])
 
     const loadData = () => {
-        fetch(`http://localhost:5000/tags/${id}`)
+        fetch(`${config.uriPath}/tags/${id}`)
             .then(res => res.json())
             .then(
                 (result) => {

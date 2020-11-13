@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from '../../config/config.json';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -61,7 +62,7 @@ export default function UserProfile(props) {
     }
 
     function handleSubmit(e) {
-        fetch(`http://localhost:5000/users`, {
+        fetch(`${config.uriPath}/users`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

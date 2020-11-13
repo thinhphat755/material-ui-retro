@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import config from '../../config/config.json';
 import Board from '../boards/index';
 import AddBoardDialog from '../addBoardDialog/index';
 
@@ -85,7 +86,7 @@ export default function BoardsList() {
 
 	const loadData = async () => {
 
-		fetch("http://localhost:5000/boards", {
+		fetch(`${config.uriPath}/boards`, {
 			headers: {
 				'Content-Type': 'application/json',
 				"userID": userID
@@ -135,7 +136,7 @@ export default function BoardsList() {
 	});
 
 	function handleDelete(boardId) {
-		fetch("http://localhost:5000/boards/" + boardId, {
+		fetch(`${config.uriPath}/boards/${boardId}`, {
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',

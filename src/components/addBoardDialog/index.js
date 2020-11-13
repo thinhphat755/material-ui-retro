@@ -1,4 +1,5 @@
 import React from 'react';
+import config from '../../config/config.json';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -34,7 +35,7 @@ export default function AddBoardDialog(props) {
     }
 
     const handleSubmit = (e) => {
-        fetch("http://localhost:5000/boards", {
+        fetch(`${config.uriPath}/boards`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

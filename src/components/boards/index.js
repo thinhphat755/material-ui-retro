@@ -1,4 +1,5 @@
 import React from 'react';
+import config from '../../config/config.json';
 import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -45,7 +46,7 @@ export default function Board(props) {
 
     function handleShare(){
         const id = board.id;
-        fetch(`http://localhost:5000/boards/share/${id}`, {
+        fetch(`${config.uriPath}/boards/share/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' }
         }).then(resp => resp.json())
