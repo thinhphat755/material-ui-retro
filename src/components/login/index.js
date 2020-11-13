@@ -1,45 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
-import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://material-ui.com/">
-                Your Website
-        </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
+import Container from '@material-ui/core/Container';
+import GoogleLogin from 'react-google-login';
+import FacebookLogin from 'react-facebook-login';
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        height: '100vh',
-    },
-    image: {
-        backgroundImage: 'url(https://source.unsplash.com/random)',
-        backgroundRepeat: 'no-repeat',
-        backgroundColor:
-            theme.palette.type === 'light' ? theme.palette.grey[50] : theme.palette.grey[900],
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-    },
     paper: {
-        margin: theme.spacing(8, 4),
+        marginTop: theme.spacing(8),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -57,75 +32,185 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function LoginSide() {
+export default function SignIn(props) {
     const classes = useStyles();
+    const [usernameText, setUsernameText] = useState('');
+    const [passwordText, setPasswordText] = useState('');
+    const history = useHistory();
+    const isAuth = localStorage.getItem("isAuth");
+    const handleChangeLoginStatus = props.handleChangeLoginStatus;
+    console.log(isAuth);
+    // if(isAuth === "true") {
+    //     history.push('/');
+    // }
+
+    const handleUsernameChange = (e) => {
+        setUsernameText(e.target.value);
+    }
+
+    const handlePasswordChange = (e) => {
+        setPasswordText(e.target.value);
+    }
+
+    function handleSubmit(e) {
+        fetch("http://localhost:5000/auth/login", {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "username": usernameText,
+                "password": passwordText
+            })
+        }).then(resp => resp.json())
+            .then(data => {
+                if (data.code === 0) {
+                    localStorage.setItem("userID", data.result.user.id);
+                    localStorage.setItem("name", data.result.user.name);
+                    localStorage.setItem("username", data.result.user.username);
+                    localStorage.setItem("isAuth", true);
+                    //console.log(localStorage.getItem("Username"));
+                    window.alert('Login succesfully!');
+                    handleChangeLoginStatus();
+                    history.push('/');
+                } else if (data.code === -1) {
+                    window.alert('Username or password is not correct. Please try again!');
+                } else if (data.code === -2) {
+                    window.alert('Account has not been existed!');
+                } else {
+                    window.alert('Invalid input!');
+                }
+            })
+
+        e.preventDefault();
+    }
+
+    const responseSuccessGoogle = (response) => {
+        fetch("http://localhost:5000/auth/googleLogin", {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "tokenId": response.tokenId
+            })
+        }).then(response => response.json())
+            .then(data => {
+                if (data.code === 0) {
+                    localStorage.setItem("userID", data.result.user.id);
+                    localStorage.setItem("name", data.result.user.name);
+                    localStorage.setItem("username", data.result.user.username);
+                    localStorage.setItem("isAuth", true);
+                    //console.log(localStorage.getItem("Username"));
+                    window.alert('Login succesfully!');
+                    handleChangeLoginStatus();
+                    history.push('/');
+                } else {
+                    window.alert('Something went wrong. Please try again!');
+                }
+            })
+    }
+
+    const responseFailGoogle = (response) => {
+
+    }
+
+    const responseSuccessFacebook = (response) => {
+        console.log(response);
+        fetch("http://localhost:5000/auth/facebookLogin", {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "email": response.email,
+                "userid": response.id,
+                "name": response.name
+            })
+        }).then(response => response.json())
+            .then(data => {
+                if (data.code === 0) {
+                    localStorage.setItem("userID", data.result.user.id);
+                    localStorage.setItem("name", data.result.user.name);
+                    localStorage.setItem("username", data.result.user.username);
+                    localStorage.setItem("isAuth", true);
+                    //console.log(localStorage.getItem("Username"));
+                    window.alert('Login succesfully!');
+                    handleChangeLoginStatus();
+                    history.push('/');
+                } else {
+                    window.alert('Something went wrong. Please try again!');
+                }
+            })
+    }
+
+    const responseFailureFacebook = (response) => {
+
+    }
 
     return (
-        <Grid container component="main" className={classes.root}>
+        <Container component="main" maxWidth="xs">
             <CssBaseline />
-            <Grid item xs={false} sm={4} md={7} className={classes.image} />
-            <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-                <div className={classes.paper}>
-                    <Avatar className={classes.avatar}>
-                        <LockOutlinedIcon />
-                    </Avatar>
-                    <Typography component="h1" variant="h5">
-                        Sign in
-                    </Typography>
-                    <form className={classes.form} noValidate>
-                        <TextField
-                            variant="outlined"
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email Address"
-                            name="email"
-                            autoComplete="email"
-                            autoFocus
-                        />
-                        <TextField
-                            variant="outlined"
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
-                        />
-                        <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
-                            label="Remember me"
-                        />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            className={classes.submit}
-                        >
-                            Sign In
-                        </Button>
-                        <Grid container>
-                            <Grid item xs>
-                                <Link href="#" variant="body2">
-                                    Forgot password?
-                                </Link>
-                            </Grid>
-                            <Grid item>
-                                <Link href="#" variant="body2">
-                                    {"Don't have an account? Sign Up"}
-                                </Link>
-                            </Grid>
+            <div className={classes.paper}>
+                <Avatar className={classes.avatar}>
+                    <LockOutlinedIcon />
+                </Avatar>
+                <Typography component="h1" variant="h5">
+                    Sign in
+                </Typography>
+                <form method="POST" className={classes.form} onSubmit={handleSubmit}>
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="userName"
+                        label="Username"
+                        name="username"
+                        onChange={handleUsernameChange}
+                        autoFocus
+                    />
+                    <TextField
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                        onChange={handlePasswordChange}
+                        autoComplete="current-password"
+                    />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className={classes.submit}
+                    >
+                        Sign In
+                    </Button>
+                    <Grid container>
+                        <Grid item>
+                            <Link to="/signup" variant="body2">
+                                Don't have an account? Sign Up
+                            </Link>
                         </Grid>
-                        <Box mt={5}>
-                            <Copyright />
-                        </Box>
-                    </form>
-                </div>
-            </Grid>
-        </Grid>
+                    </Grid>
+                    <GoogleLogin
+                        clientId="173799481794-v2vsrs8kpadgubisec0tlkpl0474ful1.apps.googleusercontent.com"
+                        buttonText="Login with Google"
+                        onSuccess={responseSuccessGoogle}
+                        onFailure={responseFailGoogle}
+                        cookiePolicy={'single_host_origin'}
+                    />
+                    <FacebookLogin
+                        buttonText="Login with Facebook"
+                        appId="404397187635613"
+                        autoLoad={true}
+                        fields="name,email,picture"
+                        onFailure={responseFailureFacebook}
+                        callback={responseSuccessFacebook} />
+                </form>
+            </div>
+        </Container>
     );
 }
